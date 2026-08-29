@@ -1,0 +1,29 @@
+application:
+  subdomain: animal-world-cup
+  upstreams:
+    - location: /create
+      backend: http://animal-world-cup:13002
+      disable_trim_location: true
+    - location: /connect
+      backend: http://animal-world-cup:13002
+      disable_trim_location: true
+      fix_websocket_header: true
+    - location: /
+      backend: http://animal-world-cup:13000/
+  public_path:
+    - /
+
+services:
+  animal-world-cup:
+    # docker.io/918178/animal-world-cup:0.1.0
+    image: docker.1ms.run/918178/animal-world-cup:0.1.0
+    environment:
+      - NODE_ENV=production
+      - PORT=13000
+      - WEB_PORT=13000
+      - ONLINE_PORT=13002
+      - NEXT_PUBLIC_ONLINE_SERVICE_URL=https://{{ .S.AppDomain }}
+
+usage: |
+  Open the application to play Animal World Cup. Public-room HTTP and WebSocket traffic is routed through the same LazyCat HTTPS application domain.
+  The image's LAN controller relay still assumes ws://<LAN IP>:13001 and is intentionally not exposed by this package.
